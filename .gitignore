@@ -1,6 +1,9 @@
 #Virtual Documents
 .virtual_documents/*
 
+#Youtube_dlc
+Data/youtube_dlc/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
