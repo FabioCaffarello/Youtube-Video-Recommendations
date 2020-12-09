@@ -89,7 +89,7 @@ class stack_scrape(object):
 		# encapsulated treatments by means of a key
 		transforms = {
 			'votes': text.replace('\nvotes', ''),
-			'answer': text.replace('answers', ''),
+			'answer': text.replace('answer', '').strip('s'),
 			'views': text.replace('views', '')
 		}
 		
