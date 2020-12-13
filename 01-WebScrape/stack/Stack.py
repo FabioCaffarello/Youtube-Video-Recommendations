@@ -1,8 +1,6 @@
 import re
 import time
-import json
 import requests
-import joblib as jp
 import pandas as pd
 
 from bs4 import BeautifulSoup
