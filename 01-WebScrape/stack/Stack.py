@@ -1,6 +1,8 @@
 import re
 import time
+import json
 import requests
+import joblib as jp
 import pandas as pd
 
 from bs4 import BeautifulSoup
@@ -262,17 +264,17 @@ class stackScrape(object):
 		-------
 		a DataFrame with the 'Tag', 'Incidence', 'Votes', 'Answer' and 'ViewsPerIncidence' data\n\t\t of the top 15 tags () ranked by the ratio of Views by Incidence\n\t\t
 		among the most incident tags in stackoverflow or stackexchange issues
-		
+
 		'''
 		# Empty Dictinaries
 		bagOfWords = {}
 		bagOfWordsVotes = {}
 		bagOfWordsAnswers = {}
 		bagOfWordsViews = {}
-		
+
 		# DataFrame with all the question that was scraped
 		df = stackScrape.scrapeData(self, base_url, tag, query_filter, max_pages, pagesize)
-		
+
 		count = 0
 		# loop on each row of the DataFrame with the questions
 		for row in df['tags'].apply(lambda row: row.split()):
@@ -293,21 +295,21 @@ class stackScrape(object):
 		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsVotes).to_frame().rename(columns={0:'Votes'}).reset_index(), how='left', left_on='index', right_on='index')
 		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsAnswers).to_frame().rename(columns={0:'Answer'}).reset_index(), how='left', left_on='index', right_on='index')
 		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsViews).to_frame().rename(columns={0:'Views'}).reset_index(), how='left', left_on='index', right_on='index')
-		
+
 		# Column Rename
 		DfTags = DfTags.rename(columns={'index': 'Tag'})
-		
+
 		# The top 25 by the incidence
 		DfTags = DfTags.sort_values('Incidence', ascending=False).head(25)
 		# relation of total of vizualizations by the total of incidence
-		
+
 		DfTags['ViewsPerIncidence'] = DfTags['Views'] / DfTags['Incidence']
-		
+
 		# Exclusion of python and r as tags
 		tagsFilter = ['python', 'r']
 		DfTags = DfTags[~DfTags['Tag'].isin(tagsFilter)]
-		
+
 		# The top 15 by the relation of total of vizualizations by the total of incidence
-		DfTags = DfTags.sort_values('ViewsPerIncidence', ascending=False).head(15)
+		DfTags = DfTags.sort_values('ViewsPerIncidence', ascending=False).head(15)	
 
 		return DfTags
