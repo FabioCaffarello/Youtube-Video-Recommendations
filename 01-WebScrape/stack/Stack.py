@@ -7,13 +7,13 @@ from bs4 import BeautifulSoup
 
 
 
-class stack_scrape(object):    
+class stackScrape(object):    
   
 	def __init__(self):
 		pass
 
 
-	def extract_data_from_url(self, url):
+	def extractDataFromUrl(self, url):
 		'''
 		Returns the scraped data from the target URL in raw format (HTML), which can be stackoverflow or stackexchange
 		
@@ -34,12 +34,12 @@ class stack_scrape(object):
 		# String -> Soup (special data structure of information)
 		soup = BeautifulSoup(html, 'html.parser')
 		# Extracts the desired information from the website and passes it on to json
-		data = stack_scrape.parse_tagged_page(self, soup)
+		data = stackScrape.parseTaggedPage(self, soup)
 		return data
 
 
 
-	def multiply_views(self, text):
+	def multiplyViews(self, text):
 		'''
 		checks for the existence of an order of magnitude (e.g. 10k), converts this string to a value by multiplying\n by the respective order of magnitude value
 		
@@ -71,7 +71,7 @@ class stack_scrape(object):
 
 
 
-	def clean_scraped_data(self, text , keyname=None):
+	def cleanScrapedData(self, text , keyname=None):
 		'''
 		performs data transformations as trim of the data if necessary and calls another function to handle values
 		
@@ -101,7 +101,7 @@ class stack_scrape(object):
 			if keyname == 'views':
 				
 				# transformation of the data into an integer and multiplies it by the order of magnitude
-				trasnf = stack_scrape.multiply_views(self, transforms[keyname])
+				trasnf = stackScrape.multiplyViews(self, transforms[keyname])
 				return trasnf
 			
 			return transforms[keyname]
@@ -113,7 +113,7 @@ class stack_scrape(object):
 		
 		
 
-	def get_id(self, q):
+	def getId(self, q):
 		'''
 		returns the clean question id on page
 		
@@ -139,7 +139,7 @@ class stack_scrape(object):
 	
 	
 
-	def parse_tagged_page(self, soup):
+	def parseTaggedPage(self, soup):
 		'''
 		Returns the scraped data from the target URL, which can be stackoverflow or stackexchange
 		
@@ -154,40 +154,40 @@ class stack_scrape(object):
 		'''
 		
 		# css target class
-		question_summaries = soup.select('.question-summary')
+		questionSummaries = soup.select('.question-summary')
 		# list of names to be assigned to data
-		key_names = ['question', 'votes', 'tags', 'answer', 'views']
+		keyNames = ['question', 'votes', 'tags', 'answer', 'views']
 		# css target class subclasses 
-		classes_needed = ['.question-hyperlink', '.vote', '.tags', '.status', '.views']
+		classesNeeded = ['.question-hyperlink', '.vote', '.tags', '.status', '.views']
 		
 		datas = []
 		# loop in each data extracted through the target css class
-		for q_el in question_summaries:
-			question_data = {}
+		for q_el in questionSummaries:
+			questionData = {}
 			
 			# loop in each enumerate subclass listed above
-			for i, _class in enumerate(classes_needed):
+			for i, _class in enumerate(classesNeeded):
 				# obtain the value of each subclass
 				sub_el = q_el.select(_class)[0]
 				# obtains the value of each subclass to generate the dictionary key 
-				keyname = key_names[i]
+				keyname = keyNames[i]
 				# attach the given treaty with its respective key to the dictionary
-				question_data[keyname] = stack_scrape.clean_scraped_data(self, sub_el.text.strip(), keyname=keyname)
+				questionData[keyname] = stackScrape.cleanScrapedData(self, sub_el.text.strip(), keyname=keyname)
 				
 				# subclass that receives a treatment of exception to the others
 				if _class == '.question-hyperlink':
 					# get the id of each question
-					question_data['id'] = stack_scrape.get_id(self, str(sub_el))
+					questionData['id'] = stackScrape.getId(self, str(sub_el))
 					
 			# attach the complete dictionary of each question to the empty list created	
-			datas.append(question_data)
+			datas.append(questionData)
 
 		return datas
 
 
 
 
-	def scrape_data(self, base_url, tag, query_filter, max_pages, pagesize):
+	def scrapeData(self, base_url, tag, query_filter, max_pages, pagesize):
 		'''
 		Itera on all selected pages by rotating the function to extract the data from each page and gather it in a json
 
@@ -220,7 +220,7 @@ class stack_scrape(object):
 			# target page url formation
 			url = f'{base_url}{tag}?tab={query_filter}&page={page_num}&pagesize={pagesize}'
 			# url data extraction 
-			datas += stack_scrape.extract_data_from_url(self, url)
+			datas += stackScrape.extractDataFromUrl(self, url)
 			# time control
 			time.sleep(0.5)
 		
@@ -271,7 +271,7 @@ class stack_scrape(object):
 		bagOfWordsViews = {}
 		
 		# DataFrame with all the question that was scraped
-		df = stack_scrape.scrape_data(self, base_url, tag, query_filter, max_pages, pagesize)
+		df = stackScrape.scrapeData(self, base_url, tag, query_filter, max_pages, pagesize)
 		
 		count = 0
 		# loop on each row of the DataFrame with the questions
