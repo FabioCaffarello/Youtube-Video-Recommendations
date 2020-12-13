@@ -273,3 +273,82 @@ class stack_scrape(object):
 		dfStack['views'] = dfStack['views'].astype(int)
 		
 		return dfStack
+	
+	
+	
+	
+	def TagsStack(self, base_url, tag, query_filter, max_pages, pagesize):
+		'''
+		returns a dataframe with the top 15 tags ranked by the ratio of Views by Incidence\n\t\t
+		among the most incident tags in the issues recorded in stackoverflow or stackexchange.\n\t\t
+		The purpose of this dataframe is to use in other stages of the Project, such as, for example,\n\t\t
+		the youtube data scraping parameter
+
+		Paramaters
+		----------
+		base_url: url path to all question filter by a tag
+					- stackexchange: https://stats.stackexchange.com/questions/tagged/
+					- stackoverflow: https://stackoverflow.com/questions/tagged/
+
+		tag: tag to be filtered (e.g.: 'python', 'r', 'javascript', ...)
+
+		query_filter: filter to perform a query ('Newest', 'Active', 'Bounties', 'Unanswered', 'Frequent', Votes')
+
+		max_pages: the maximum number of pages to be scraped
+
+		pagesize: the number of records per page (the maximum number is 50)
+
+
+		Returns
+		-------
+		a DataFrame with the 'Tag', 'Incidence', 'Votes', 'Answer' and 'ViewsPerIncidence' data\n\t\t of the top 15 tags () ranked by the ratio of Views by Incidence\n\t\t
+		among the most incident tags in stackoverflow or stackexchange issues
+		
+		'''
+		# Empty Dictinaries
+		bagOfWords = {}
+		bagOfWordsVotes = {}
+		bagOfWordsAnswers = {}
+		bagOfWordsViews = {}
+		
+		# DataFrame with all the question that was scraped
+		df = stack_scrape.scrape_data(self, base_url, tag, query_filter, max_pages, pagesize)
+		
+		count = 0
+		# loop on each row of the DataFrame with the questions
+		for row in df['tags'].apply(lambda row: row.split()):
+			# loop on each tag of the set of tags in each row of the DataFrame
+			for i in row:
+				# Incidence of each tag
+				bagOfWords[i] = bagOfWords.get(i, 0) + 1
+				# sum total of votes per tag
+				bagOfWordsVotes[i] = bagOfWordsVotes.get(i, 0) + df.loc[count, 'votes']
+				# sum total of answers per tag
+				bagOfWordsAnswers[i] = bagOfWordsAnswers.get(i, 0) + df.loc[count, 'answer']
+				# sum total of views per tag
+				bagOfWordsViews[i] = bagOfWordsViews.get(i, 0) + df.loc[count, 'views']
+
+			count += 1
+		# Merge All the dictionaries into one DataFrame
+		DfTags = pd.Series(bagOfWords).to_frame().rename(columns={0:'Incidence'}).reset_index()
+		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsVotes).to_frame().rename(columns={0:'Votes'}).reset_index(), how='left', left_on='index', right_on='index')
+		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsAnswers).to_frame().rename(columns={0:'Answer'}).reset_index(), how='left', left_on='index', right_on='index')
+		DfTags = pd.merge(DfTags, pd.Series(bagOfWordsViews).to_frame().rename(columns={0:'Views'}).reset_index(), how='left', left_on='index', right_on='index')
+		
+		# Column Rename
+		DfTags = DfTags.rename(columns={'index': 'Tag'})
+		
+		# The top 25 by the incidence
+		DfTags = DfTags.sort_values('Incidence', ascending=False).head(25)
+		# relation of total of vizualizations by the total of incidence
+		
+		DfTags['ViewsPerIncidence'] = DfTags['Views'] / DfTags['Incidence']
+		
+		# Exclusion of python and r as tags
+		tagsFilter = ['python', 'r']
+		DfTags = DfTags[~DfTags['Tag'].isin(tagsFilter)]
+		
+		# The top 15 by the relation of total of vizualizations by the total of incidence
+		DfTags = DfTags.sort_values('ViewsPerIncidence', ascending=False).head(15)
+
+		return DfTags
