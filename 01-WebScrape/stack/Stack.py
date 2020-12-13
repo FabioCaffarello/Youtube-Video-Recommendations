@@ -1,6 +1,7 @@
 import re
 import time
 import requests
+import pandas as pd
 
 from bs4 import BeautifulSoup
 
@@ -183,35 +184,75 @@ class stack_scrape(object):
 
 		return datas
 
-	
-	
+
+
+# 	def scrape_data(self, base_url, tag, query_filter, max_pages, pagesize):
+# 		'''
+# 		Itera on all selected pages by rotating the function to extract the data from each page and gather it in a json
+		
+# 		Paramaters
+# 		----------
+# 		base_url: url path to all question filter by a tag
+# 					- stackexchange: https://stats.stackexchange.com/questions/tagged/
+# 					- stackoverflow: https://stackoverflow.com/questions/tagged/
+					
+# 		tag: tag to be filtered (e.g.: 'python', 'r', 'javascript', ...)
+		
+# 		query_filter: filter to perform a query ('Newest', 'Active', 'Bounties', 'Unanswered', 'Frequent', Votes')
+		
+# 		max_pages: the maximum number of pages to be scraped
+		
+# 		pagesize: the number of records per page (the maximum number is 50)
+		
+		
+# 		Returns
+# 		-------
+# 		a JSON with the 'Question', 'Number of Votes', 'question-related tags', 'number of responses' and 'number of views' data\n\t\t from the records of all selected pages
+# 		'''
+		
+		
+# 		datas = list()
+# 		# loop on each page of the given range
+# 		for p in range(max_pages):
+# 			# adjustment of the iteration variable
+# 			page_num = p + 1
+# 			# target page url formation
+# 			url = f'{base_url}{tag}?tab={query_filter}&page={page_num}&pagesize={pagesize}'
+# 			# url data extraction 
+# 			datas += stack_scrape.extract_data_from_url(self, url)
+# 			# time control
+# 			time.sleep(0.5)
+# 		return datas
+
+
+
 
 
 	def scrape_data(self, base_url, tag, query_filter, max_pages, pagesize):
 		'''
 		Itera on all selected pages by rotating the function to extract the data from each page and gather it in a json
-		
+
 		Paramaters
 		----------
 		base_url: url path to all question filter by a tag
 					- stackexchange: https://stats.stackexchange.com/questions/tagged/
 					- stackoverflow: https://stackoverflow.com/questions/tagged/
-					
+
 		tag: tag to be filtered (e.g.: 'python', 'r', 'javascript', ...)
-		
+
 		query_filter: filter to perform a query ('Newest', 'Active', 'Bounties', 'Unanswered', 'Frequent', Votes')
-		
+
 		max_pages: the maximum number of pages to be scraped
-		
+
 		pagesize: the number of records per page (the maximum number is 50)
-		
-		
+
+
 		Returns
 		-------
-		a JSON with the 'Question', 'Number of Votes', 'question-related tags', 'number of responses' and 'number of views' data\n\t\t from the records of all selected pages
+		a DataFrame with the 'Question', 'Number of Votes', 'question-related tags', 'number of responses' and 'number of views' data\n\t\t from the records of all selected pages
 		'''
-		
-		
+
+
 		datas = list()
 		# loop on each page of the given range
 		for p in range(max_pages):
@@ -223,4 +264,12 @@ class stack_scrape(object):
 			datas += stack_scrape.extract_data_from_url(self, url)
 			# time control
 			time.sleep(0.5)
-		return datas
+		
+		# DataFrame
+		dfStack = pd.DataFrame(datas, columns=datas[0].keys())
+		# DataFrame convert dtypes (int)
+		dfStack['votes'] = dfStack['votes'].astype(int)
+		dfStack['answer'] = dfStack['answer'].astype(int)
+		dfStack['views'] = dfStack['views'].astype(int)
+		
+		return dfStack
