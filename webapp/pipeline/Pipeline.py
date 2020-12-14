@@ -9,10 +9,8 @@ from scipy.sparse import hstack
 class DataPipeline(object):
     
 	def __init__(self):
-		self.home_path = 'D:/01-DataScience/04-Projetos/00-Git/Youtube-Video-Recommendations/webapp/'
+		self.home_path = ''
 		self.titleVec  = jb.load(open(self.home_path + 'parameter/titleVec.pkl.z', 'rb'))
-		self.modelLGBM = jb.load(open(self.home_path + 'model/modelLgbm.pkl.z', 'rb'))
-		self.modelRf   = jb.load(open(self.home_path + 'model/modelRf.pkl.z', 'rb'))
 
 	def dataCleaningRaw(self, df):
 		df['LikeCount'] = df['LikeCount'].apply(lambda row: 0 if math.isnan(row) else row)
@@ -58,4 +56,4 @@ class DataPipeline(object):
 		pred = 0.5*pLgbm + 0.5*pRf
 		dfResults = orinalDataset[['Title', 'WebpageUrl']].copy()
 		dfResults['Predict'] = pred
-		return dfResults
+		return dfResults.to_json(orient='records', date_format='iso')
