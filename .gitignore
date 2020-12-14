@@ -7,6 +7,9 @@ Data/youtube_dlc/*
 #Credentials
 Credentials/*
 
+#telegramApiDocker
+telegramApiDocker/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
