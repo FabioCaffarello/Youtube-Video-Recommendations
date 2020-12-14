@@ -50,9 +50,11 @@ class DataPipeline(object):
         dataWTitle = hstack([df, titleBowVec])
         return dataWTitle
     
-    def predict(self, orinalDataset, dataWTitle):
-        modelLGBM = self.modelLGBM
-        modelRf = self.modelRf
+    def getPrediction(self, modelLGBM, modelRf, orinalDataset, dataWTitle):
+#         modelLGBM = self.modelLGBM
+#         modelRf = self.modelRf
+		modelLGBM = modelLGBM
+        modelRf = modelRf
         pLgbm = modelLGBM.predict_proba(dataWTitle)[:,1]
         pRf = modelRf.predict_proba(dataWTitle)[:,1]
         pred = 0.5*pLgbm + 0.5*pRf
