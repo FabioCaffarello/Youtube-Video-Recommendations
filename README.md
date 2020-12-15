@@ -10,6 +10,9 @@ I am constantly looking for videos on youtube to learn or test new techniques of
 With the premise of reducing search time, I will use machine learning algorithms, which, recommend the 5 videos of each relevant subject with greater chances of my liking. The recommendation will be returned through a bot in the telegram, this way I have easy access both by cell phone and computer.
 
 >**This solution involves 3 main steps**
->- Survey of relevant subjects
->- Machine Leraning model construction for video recommendations
+>- Survey of relevant subjects in Data Science.
+>- Machine Leraning model construction for video recommendations.
 >- Elaboration of the bot in Telegram that performs interaction with the user.
+
+## To survey relevant issues in datascience will be used the StatckExchange (link: https://stats.stackexchange.com/questions)
+- Stack Exchange is a network of questions and answers (Q&A) on topics in various fields related to datascience, each question covers one or more of a subject through tags
