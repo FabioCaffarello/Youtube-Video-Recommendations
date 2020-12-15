@@ -22,6 +22,5 @@ def updateDB():
     with sql.connect(dbName) as conn:
         data = data[['Id', 'Title', 'WebpageUrl', 'LikeCount', 'UploadDate', 'Duration', 'IncidenceStack', 'VotesStack', 'ViewCount', 'TagStack']]
         data.to_sql(name='videos', con=conn, if_exists='replace', index=False)
-        cur = conn.cursor()
         conn.commit()
     return True
